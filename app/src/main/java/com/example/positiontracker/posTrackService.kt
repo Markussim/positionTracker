@@ -130,7 +130,7 @@ class posTrackService : LifecycleService() {
 
                     var title = "GPS Tracker"
 
-                    if (location.accuracy < 5) {
+                    if (location.accuracy < 10) {
                         if (oldLocation != null) {
                             var distance = location.distanceTo(oldLocation)
                             distanceTraveled += distance
