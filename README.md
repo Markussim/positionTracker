@@ -1,6 +1,7 @@
 <h1>
   Position Tracker
 </h1>
+<br>
 <p>Position Tracker is a privately <b>GPS Tracking</b> android app written in <b>Kotlin</b>.
   <br>
   <a href="https://github.com/Markussim/positionTracker/blob/main/LICENSE"><img
