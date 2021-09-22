@@ -41,26 +41,33 @@ class posTrackService : LifecycleService() {
             when (it.action) {
                 ACTION_START_OR_RESUME_SERVICE -> {
                     println("Started or resumed")
-                    startForegroundService()
                     time = System.currentTimeMillis()
 
                     if (ActivityCompat.checkSelfPermission(
-                            this,
-                            Manifest.permission.ACCESS_FINE_LOCATION
-                        ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                            this,
-                            Manifest.permission.ACCESS_COARSE_LOCATION
-                        ) != PackageManager.PERMISSION_GRANTED
+                                    this,
+                                    Manifest.permission.ACCESS_FINE_LOCATION
+                            ) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                                    this,
+                                    Manifest.permission.ACCESS_COARSE_LOCATION
+                            ) == PackageManager.PERMISSION_GRANTED
+                            && ActivityCompat.checkSelfPermission(
+                                    this,
+                                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                            ) == PackageManager.PERMISSION_GRANTED
                     ) {
-
+                        println("Got premition")
+                        startForegroundService()
+                        locationManager?.requestLocationUpdates(
+                                LocationManager.GPS_PROVIDER,
+                                0L,
+                                0f,
+                                locationListener
+                        )
+                    } else {
                     }
-                    locationManager?.requestLocationUpdates(
-                        LocationManager.GPS_PROVIDER,
-                        0L,
-                        0f,
-                        locationListener
-                    )
+
                 }
+
                 ACTION_STOP_SERVICE -> {
                     locationManager?.removeUpdates(locationListener)
                     println("Stoped")
@@ -73,6 +80,7 @@ class posTrackService : LifecycleService() {
             }
         }
         return super.onStartCommand(intent, flags, startId)
+
     }
 
     private fun startForegroundService() {

@@ -32,6 +32,7 @@ import java.lang.Exception
 import java.nio.file.FileStore
 import kotlin.concurrent.thread
 import android.content.DialogInterface
+import kotlin.system.exitProcess
 
 
 class MainActivity : AppCompatActivity() {
@@ -58,6 +59,47 @@ class MainActivity : AppCompatActivity() {
 
         var running = false
 
+        if (ActivityCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            val permissionsBuilder: AlertDialog.Builder = AlertDialog.Builder(this)
+
+            permissionsBuilder.setTitle("Position")
+            permissionsBuilder.setMessage("This app requires position permissions as it tracks your position. Without it the app is not usable")
+
+            permissionsBuilder.setNegativeButton(
+                    "Close app",
+                    DialogInterface.OnClickListener { dialog, which -> // Do nothing
+                        dialog.dismiss()
+                        moveTaskToBack(true);
+                        exitProcess(-1)
+                    })
+
+            permissionsBuilder.setPositiveButton(
+                    "Accept",
+                    DialogInterface.OnClickListener { dialog, which -> // Clear data
+                        ActivityCompat.requestPermissions(
+                                this@MainActivity,
+                                arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION), 1
+                        )
+                    })
+
+
+            val permissionsAlert: AlertDialog = permissionsBuilder.create()
+
+            permissionsAlert.show()
+
+        }
+
         bottomButton.setOnClickListener {
 
 
@@ -67,24 +109,28 @@ class MainActivity : AppCompatActivity() {
                 running = false
                 bottomButton.text = "Start"
             } else {
-                sendCommandToService("ACTION_START_OR_RESUME_SERVICE")
                 println("Started in Main")
+
                 if (ActivityCompat.checkSelfPermission(
-                        this,
-                        Manifest.permission.ACCESS_FINE_LOCATION
-                    ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                        this,
-                        Manifest.permission.ACCESS_COARSE_LOCATION
-                    ) != PackageManager.PERMISSION_GRANTED
-                    && ActivityCompat.checkSelfPermission(
-                        this,
-                        Manifest.permission.ACCESS_BACKGROUND_LOCATION
-                    ) != PackageManager.PERMISSION_GRANTED
+                                this,
+                                Manifest.permission.ACCESS_FINE_LOCATION
+                        ) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                                this,
+                                Manifest.permission.ACCESS_COARSE_LOCATION
+                        ) == PackageManager.PERMISSION_GRANTED
+                        && ActivityCompat.checkSelfPermission(
+                                this,
+                                Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                        ) == PackageManager.PERMISSION_GRANTED
                 ) {
-                    ActivityCompat.requestPermissions(
-                        this@MainActivity,
-                        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1
-                    )
+                    sendCommandToService("ACTION_START_OR_RESUME_SERVICE")
+
+                } else {
+                    Toast.makeText(
+                            baseContext, "You did not allow permissions, please restart the app to accept",
+                            Toast.LENGTH_SHORT
+                    ).show()
+                    println("Not permissions")
                 }
                 running = true
 
@@ -127,12 +173,12 @@ class MainActivity : AppCompatActivity() {
             MainActivity.AppDatabase::class.java, "positionsList"
         ).build()
 
-        val builder: AlertDialog.Builder = AlertDialog.Builder(this)
+        val clearBuilder: AlertDialog.Builder = AlertDialog.Builder(this)
 
-        builder.setTitle("Confirm")
-        builder.setMessage("Are you sure you want to clear all gps data that is not exported?")
+        clearBuilder.setTitle("Confirm")
+        clearBuilder.setMessage("Are you sure you want to clear all gps data that is not exported?")
 
-        builder.setNegativeButton(
+        clearBuilder.setNegativeButton(
             "NO",
             DialogInterface.OnClickListener { dialog, which -> // Do nothing
                 dialog.dismiss()
@@ -144,7 +190,7 @@ class MainActivity : AppCompatActivity() {
                 }
             })
 
-        builder.setPositiveButton(
+        clearBuilder.setPositiveButton(
             "YES",
             DialogInterface.OnClickListener { dialog, which -> // Clear data
 
@@ -168,13 +214,14 @@ class MainActivity : AppCompatActivity() {
             })
 
 
-        val alert: AlertDialog = builder.create()
+        val clearAlert: AlertDialog = clearBuilder.create()
 
         clearButton.setOnClickListener {
             runOnUiThread {
-                alert.show()
+                clearAlert.show()
             }
         }
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
