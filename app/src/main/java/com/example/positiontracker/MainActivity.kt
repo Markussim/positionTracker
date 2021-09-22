@@ -73,8 +73,8 @@ class MainActivity : AppCompatActivity() {
         ) {
             val permissionsBuilder: AlertDialog.Builder = AlertDialog.Builder(this)
 
-            permissionsBuilder.setTitle("Position")
-            permissionsBuilder.setMessage("This app requires position permissions as it tracks your position. Without it the app is not usable")
+            permissionsBuilder.setTitle("Location")
+            permissionsBuilder.setMessage("This app requires location permissions as it tracks your location, even in the background. This is saved to a database and you can later export it to a GPX file. \n\nNo data is sent to a server.")
 
             permissionsBuilder.setNegativeButton(
                     "Close app",
