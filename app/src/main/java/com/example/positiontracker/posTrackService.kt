@@ -93,7 +93,7 @@ class posTrackService : LifecycleService() {
 
 
         val notification = notificationBuilder.setOngoing(true)
-            .setSmallIcon(R.mipmap.ic_launcher_round)
+            .setSmallIcon(R.drawable.notification)
             .setCategory(Notification.CATEGORY_SERVICE)
             .setContentTitle("GPS Tracker")
             .setContentText("Loading")
@@ -156,7 +156,7 @@ class posTrackService : LifecycleService() {
                     println(count)
 
                     val notification = notificationBuilder.setOngoing(true)
-                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setSmallIcon(R.drawable.notification)
                         .setCategory(Notification.CATEGORY_SERVICE)
                         .setContentTitle(title)
                         .setContentText(
